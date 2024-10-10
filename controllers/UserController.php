@@ -229,18 +229,24 @@ class UserController extends Controller
      */
     public function actionActivate($id)
     {
-        /* @var $user User */
+         /* @var $user User */
         $user = $this->findModel($id);
-        if ($user->status == UserStatus::INACTIVE) {
-            $user->status = UserStatus::ACTIVE;
-            if ($user->save()) {
-                return $this->goHome();
-            } else {
-                $errors = $user->firstErrors;
-                throw new UserException(reset($errors));
-            }
+        
+        // Toggle user status between ACTIVE and INACTIVE
+        if ($user->status == UserStatus::ACTIVE) {
+            $user->status = UserStatus::INACTIVE;  // Deactivate the user
+        } else {
+            $user->status = UserStatus::ACTIVE;    // Activate the user
         }
-        return $this->goHome();
+    
+        // Save and check if operation was successful
+        if ($user->save()) {
+            return $this->goHome();  // Redirect to home or any other page
+        } else {
+            // Handle save failure by throwing an exception
+            $errors = $user->firstErrors;
+            throw new UserException(reset($errors));  // Throw the first error
+        }
     }
 
     /**
